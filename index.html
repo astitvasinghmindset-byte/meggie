@@ -386,6 +386,56 @@
     display: block !important;
   }
 }
+      /* ---- FIX MOBILE LAYOUT: ABOUT BELOW IMAGE ---- */
+@media (max-width: 640px) {
+
+  /* Make intro section height grow naturally */
+  .intro-section {
+    height: auto !important;
+    padding-bottom: 40px;
+  }
+
+  /* Put heart animation centered */
+  .heart-container {
+    width: 240px;
+    height: 240px;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+
+  /* KEEP photo centered */
+  .photo {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .photo img {
+    width: 280px !important;
+    margin-top: 20px;
+  }
+
+  /* FIX — About text should appear BELOW the image */
+  .about-text {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 90%;
+    margin: 20px auto 0 auto;
+    text-align: center;
+    opacity: 1 !important;
+    display: block !important;
+  }
+
+  /* Prevent video and text from overlapping */
+  .overlay {
+    position: fixed;
+  }
+}
+
 
     </style>
   </head>
@@ -705,6 +755,7 @@ else {
     </script>
   </body>
 </html>
+
 
 
 
