@@ -341,6 +341,51 @@
     height: 210px;
   }
 }
+/* ---- MOBILE FIX FOR WELCOME + ABOUT TEXT ---- */
+@media (max-width: 640px) {
+
+  /* Keep welcome inside screen */
+  .welcome {
+    font-size: 1.6rem !important;
+    text-align: center;
+    width: 90%;
+    white-space: normal !important;
+  }
+
+  /* Resize heart container */
+  .heart-container {
+    width: 240px;
+    height: 240px;
+    transform: translate(-50%, -50%) scale(0.75) !important;
+  }
+
+  .heart-video {
+    width: 65px;
+    height: 65px;
+  }
+
+  .photo img {
+    width: 230px !important;
+  }
+
+  /* Prevent photo and text from flying out */
+  .photo {
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .about-text {
+    position: relative;
+    top: auto;
+    right: auto;
+    transform: none;
+    margin-top: 20px;
+    width: 90%;
+    text-align: center;
+    opacity: 1 !important; /* make sure it's visible */
+    display: block !important;
+  }
+}
 
     </style>
   </head>
@@ -574,7 +619,15 @@
       gsap.to(".heart-container", { opacity: 0, delay: 5, duration: 1 });
 
       gsap.to(".photo", { opacity: 1, delay: 6, duration: 1 });
-      gsap.to(".photo", { x: "-90%", delay: 7, duration: 1.5, scale: 0.8 });
+     // Desktop animation
+if (window.innerWidth > 640) {
+  gsap.to(".photo", { x: "-90%", delay: 7, duration: 1.5, scale: 0.8 });
+}
+// Mobile-safe animation
+else {
+  gsap.to(".photo", { x: "0%", delay: 7, duration: 1.5, scale: 0.8 });
+}
+
 
       gsap.to(".about-text", { opacity: 1, delay: 8.5, duration: 1 });
       gsap.to(".video-bg", { opacity: 1, delay: 6.5, duration: 1.5 });
@@ -652,5 +705,6 @@
     </script>
   </body>
 </html>
+
 
 
