@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Influencer Intro</title>
+
+    <style>
+      /* ---- GLOBAL RESET ---- */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden; /* allow normal scroll */
+        overflow-y: auto;
+        font-family: Arial, sans-serif;
+        background: pink;
+      }
+
+      /* ---- INTRO SECTION ---- */
+      .intro-section {
+        position: relative;
+        width: 100%;
+        height: 100vh; /* full screen */
+        overflow: hidden;
+      }
+
+      /* Welcome Overlay */
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 5;
+      }
+      .welcome {
+        font-size: 3rem;
+        color: white;
+        opacity: 0;
+        white-space: nowrap;
+      }
+
+      /* Heart Videos */
+      .heart-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: 400px;
+        opacity: 0;
+        z-index: 4;
+      }
+      .heart-video {
+        width: 100px;
+        height: 100px;
+        border-radius: 15px;
+        object-fit: cover;
+        position: absolute;
+      }
+      .heart-video:nth-child(1) {
+        top: 0;
+        left: 150px;
+      }
+      .heart-video:nth-child(2) {
+        top: 50px;
+        left: 50px;
+      }
+      .heart-video:nth-child(3) {
+        top: 50px;
+        left: 250px;
+      }
+      .heart-video:nth-child(4) {
+        top: 150px;
+        left: 0;
+      }
+      .heart-video:nth-child(5) {
+        top: 150px;
+        left: 300px;
+      }
+      .heart-video:nth-child(6) {
+        top: 250px;
+        left: 100px;
+      }
+      .heart-video:nth-child(7) {
+        top: 250px;
+        left: 200px;
+      }
+
+      /* Photo */
+      .photo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        z-index: 3;
+      }
+      .photo img {
+        width: 500px;
+        border-radius: 15px;
+      }
+
+      /* Background Video */
+      .video-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        opacity: 0;
+      }
+
+      /* About text */
+      .about-text {
+        position: absolute;
+        top: 50%;
+        right: 8%;
+        transform: translateY(-50%);
+        max-width: 550px;
+        font-size: 1.1rem;
+        line-height: 1.4;
+        color: black;
+        opacity: 0;
+        z-index: 4;
+        text-align: left;
+      }
+
+      /* ---- VIDEO GALLERY (pink area) ---- */
+      .video-gallery {
+        background: pink; /* same pink as body */
+        padding: 80px 20px;
+        box-sizing: border-box;
+      }
+
+      .video-title {
+        text-align: center;
+        font-size: 2rem;
+        margin: 0 0 30px 0;
+        color: #222;
+      }
+
+      .video-grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .video-thumb {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        transition: transform 0.28s ease, box-shadow 0.28s ease;
+        background: #000;
+      }
+
+      .video-thumb:hover {
+        transform: scale(1.03);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+      }
+
+      .video-thumb video {
+        width: 100%;
+        height: 170px;
+        object-fit: cover;
+        display: block;
+        border-radius: 12px;
+        pointer-events: auto; /* allow tap on mobile */
+      }
+
+      /* small play overlay icon */
+      .video-thumb .play-icon {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 40px;
+        color: rgba(255, 255, 255, 0.95);
+        pointer-events: none;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      }
+
+      /* ---- MODAL PLAYER ---- */
+      .video-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .video-modal.show {
+        display: flex;
+        animation: modalIn 220ms ease;
+      }
+
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .video-modal video {
+        width: 100%;
+        max-width: 900px;
+        max-height: 85vh;
+        border-radius: 12px;
+        background: black;
+      }
+
+      .close-btn {
+        position: fixed;
+        top: 20px;
+        right: 26px;
+        color: #fff;
+        font-size: 34px;
+        cursor: pointer;
+        z-index: 10001;
+        line-height: 1;
+      }
+
+      /* ---- SCROLLABLE SECTIONS ---- */
+      .bottom-sections {
+        margin-top: 0;
+        background: white;
+        padding: 40px 0;
+      }
+
+      .info-box,
+      .contact-box {
+        width: 70%;
+        background: #555;
+        padding: 40px;
+        margin: 40px auto;
+        color: white;
+        border-radius: 10px;
+      }
+      .info-box h2,
+      .contact-box h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      /* contact box */
+      .contact-box input,
+      .contact-box textarea {
+        width: 100%;
+        margin: 12px 0;
+        padding: 12px;
+        border: none;
+        border-radius: 6px;
+      }
+      .contact-box button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        background: hotpink;
+        color: white;
+        cursor: pointer;
+      }
+
+      /* responsive tweaks */
+      @media (max-width: 640px) {
+        .photo img {
+          width: 320px;
+        }
+        .about-text {
+          display: none;
+        } /* keep intro simple on small screens */
+        .video-thumb video {
+          height: 220px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ********** INTRO SECTION ********** -->
+    <div class="intro-section">
+      <!-- Welcome Overlay -->
+      <div class="overlay">
+        <div class="welcome" id="welcome-text"></div>
+      </div>
+
+      <!-- Heart Videos -->
+      <div class="heart-container">
+        <video
+          autoplay
+          muted
+          loop
+          class="heart-video"
+          src="media/video1.mp4"
+        ></video>
+        <video
+          autoplay
+          muted
+          loop
+          class="heart-video"
+          src="media/video2.mp4"
+        ></video>
+        <video
+          autoplay
+          muted
+          loop
+          class="heart-video"
+          src="media/video3.mp4"
+        ></video>
+        <video
+          autoplay
+          muted
+          loop
+          class="heart-video"
+          src="media/video4.mp4"
+        ></video>
+        <video
+          autoplay
+          muted
+          loop
+          class="heart-video"
+          src="media/video5.mp4"
+        ></video>
+        <video
+          autoplay
+          muted
+          loop
+          class="heart-video"
+          src="media/video6.mp4"
+        ></video>
+        <video
+          autoplay
+          muted
+          loop
+          class="heart-video"
+          src="media/video7.mp4"
+        ></video>
+      </div>
+
+      <!-- Photo -->
+      <div class="photo">
+        <img src="media/img2.jpg" alt="Influencer" />
+      </div>
+
+      <!-- About Meggie (KEPT IN INTRO AREA) -->
+      <div class="about-text">
+        <h2>About Meggie</h2>
+        <p>
+          About Meggie Meggie is a passionate fitness and wellness coach
+          dedicated to helping others step into their strength—physically,
+          mentally, and emotionally. Through her work at CHS Fitness and The
+          Works, she leads with authenticity, heart, and a deep belief that
+          movement has the power to transform lives. Her journey is rooted in
+          resilience, community, and a commitment to growth. Whether she’s
+          guiding a high-energy class, sharing moments of motherhood, or showing
+          up vulnerably in her own evolution, Meggie invites others to see
+          change as something empowering—not overwhelming. Her mantra, “If you
+          change the way you look at things, the things you look at change,”
+          drives her approach to both fitness and life. Meggie’s classes and
+          content reflect the things she values most: connection, intention,
+          joy, and the power of showing up. She continues to inspire a community
+          of people who are ready to move, heal, laugh, and grow—with her and
+          with each other. If you want it to sound more formal, more casual,
+          more motivational, or more brand-focused, I can adjust it!
+        </p>
+      </div>
+
+      <!-- Background Video -->
+      <video autoplay muted loop class="video-bg">
+        <source src="background-video.mp4" type="video/mp4" />
+      </video>
+    </div>
+
+    <!-- ********** VIDEO GALLERY (pink area) ********** -->
+    <section class="video-gallery" aria-label="Meggie videos">
+      <h2 class="video-title">Meggie’s Videos</h2>
+
+      <div class="video-grid">
+        <!-- Use the same video files you already have -->
+        <div class="video-thumb" data-src="media/video1.mp4">
+          <video
+            preload="metadata"
+            muted
+            playsinline
+            src="media/video1.mp4"
+          ></video>
+          <div class="play-icon">▶</div>
+        </div>
+
+        <div class="video-thumb" data-src="media/video2.mp4">
+          <video
+            preload="metadata"
+            muted
+            playsinline
+            src="media/video2.mp4"
+          ></video>
+          <div class="play-icon">▶</div>
+        </div>
+
+        <div class="video-thumb" data-src="media/video3.mp4">
+          <video
+            preload="metadata"
+            muted
+            playsinline
+            src="media/video3.mp4"
+          ></video>
+          <div class="play-icon">▶</div>
+        </div>
+
+        <div class="video-thumb" data-src="media/video4.mp4">
+          <video
+            preload="metadata"
+            muted
+            playsinline
+            src="media/video4.mp4"
+          ></video>
+          <div class="play-icon">▶</div>
+        </div>
+
+        <div class="video-thumb" data-src="media/video5.mp4">
+          <video
+            preload="metadata"
+            muted
+            playsinline
+            src="media/video5.mp4"
+          ></video>
+          <div class="play-icon">▶</div>
+        </div>
+
+        <div class="video-thumb" data-src="media/video6.mp4">
+          <video
+            preload="metadata"
+            muted
+            playsinline
+            src="media/video6.mp4"
+          ></video>
+          <div class="play-icon">▶</div>
+        </div>
+
+        <div class="video-thumb" data-src="media/video7.mp4">
+          <video
+            preload="metadata"
+            muted
+            playsinline
+            src="media/video7.mp4"
+          ></video>
+          <div class="play-icon">▶</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ********** BOTTOM SCROLL SECTIONS ********** -->
+    <div class="bottom-sections">
+      <section class="info-box">
+        <h2>Follow Her</h2>
+        <p>YouTube • TikTok • Instagram</p>
+      </section>
+
+      <section class="info-box">
+        <h2>Family Details</h2>
+        <p>Brief info about family members.</p>
+      </section>
+
+      <section class="info-box">
+        <h2>Career & Journey</h2>
+        <p>Timeline or story of her career and achievements.</p>
+      </section>
+
+      <section class="contact-box">
+        <h2>Contact Her</h2>
+        <input type="text" placeholder="Your Name" />
+        <input type="email" placeholder="Your Email" />
+        <textarea placeholder="Your Message"></textarea>
+        <button>Send Message</button>
+      </section>
+    </div>
+
+    <!-- Modal player (placed near end of body) -->
+    <div id="videoModal" class="video-modal" aria-hidden="true">
+      <div class="close-btn" id="closeBtn" aria-label="Close video">
+        &times;
+      </div>
+      <video id="modalVideo" controls playsinline></video>
+    </div>
+
+    <!-- GSAP Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+      // Typewriter effect
+      const text = "Welcome to Meggie Austin's Life";
+      let i = 0;
+      function typeWriter() {
+        if (i < text.length) {
+          document.getElementById("welcome-text").textContent += text.charAt(i);
+          i++;
+          setTimeout(typeWriter, 100);
+        }
+      }
+
+      // Animations
+      gsap.to(".welcome", { opacity: 1, duration: 1, onComplete: typeWriter });
+      gsap.to(".heart-container", { opacity: 1, delay: 0.5, duration: 1 });
+      gsap.to(".heart-container", { scale: 1.5, delay: 2, duration: 3 });
+      gsap.to(".overlay", { opacity: 0, delay: 4, duration: 1 });
+      gsap.to(".heart-container", { opacity: 0, delay: 5, duration: 1 });
+
+      gsap.to(".photo", { opacity: 1, delay: 6, duration: 1 });
+      gsap.to(".photo", { x: "-90%", delay: 7, duration: 1.5, scale: 0.8 });
+
+      gsap.to(".about-text", { opacity: 1, delay: 8.5, duration: 1 });
+      gsap.to(".video-bg", { opacity: 1, delay: 6.5, duration: 1.5 });
+
+      // Video gallery + modal logic
+      (function () {
+        const thumbs = document.querySelectorAll(".video-thumb");
+        const modal = document.getElementById("videoModal");
+        const modalVideo = document.getElementById("modalVideo");
+        const closeBtn = document.getElementById("closeBtn");
+
+        // Helper to open modal with src
+        function openModal(src) {
+          modalVideo.src = src;
+          // ensure controls & autoplay
+          modalVideo.controls = true;
+          modalVideo.autoplay = true;
+          modal.classList.add("show");
+          modal.setAttribute("aria-hidden", "false");
+          // play after a tick to allow modal to be visible
+          setTimeout(() => {
+            modalVideo.play().catch(() => {
+              /* autoplay may be blocked on some browsers */
+            });
+          }, 60);
+        }
+
+        // Helper to close modal and stop video
+        function closeModal() {
+          modalVideo.pause();
+          modalVideo.removeAttribute("src");
+          modalVideo.load();
+          modal.classList.remove("show");
+          modal.setAttribute("aria-hidden", "true");
+        }
+
+        // Click or tap a thumbnail
+        thumbs.forEach((thumb) => {
+          const vid = thumb.querySelector("video");
+          const src =
+            thumb.getAttribute("data-src") ||
+            (vid && vid.currentSrc) ||
+            vid?.getAttribute("src");
+          // make entire thumb clickable
+          thumb.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (!src) return;
+            openModal(src);
+          });
+
+          // also allow pressing Enter/Space for accessibility
+          thumb.tabIndex = 0;
+          thumb.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              const s = thumb.getAttribute("data-src");
+              openModal(s);
+            }
+          });
+        });
+
+        // close handlers
+        closeBtn.addEventListener("click", closeModal);
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal) closeModal();
+        });
+
+        // stop video on escape
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && modal.classList.contains("show")) {
+            closeModal();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
