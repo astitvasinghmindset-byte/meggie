@@ -291,6 +291,57 @@
           height: 220px;
         }
       }
+      /* ---- MOBILE FIXES ---- */
+@media (max-width: 640px) {
+
+  .intro-section {
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Scale down the heart animation for mobile */
+  .heart-container {
+    width: 250px;
+    height: 250px;
+    transform: translate(-50%, -50%) scale(0.75); 
+  }
+
+  .heart-video {
+    width: 70px;
+    height: 70px;
+  }
+
+  /* Adjust individual positions so nothing goes off-screen */
+  .heart-video:nth-child(1) { top: 0; left: 90px; }
+  .heart-video:nth-child(2) { top: 30px; left: 30px; }
+  .heart-video:nth-child(3) { top: 30px; left: 150px; }
+  .heart-video:nth-child(4) { top: 100px; left: 0; }
+  .heart-video:nth-child(5) { top: 100px; left: 180px; }
+  .heart-video:nth-child(6) { top: 170px; left: 60px; }
+  .heart-video:nth-child(7) { top: 170px; left: 120px; }
+
+  /* Resize photo properly */
+  .photo img {
+    width: 250px;
+  }
+
+  /* Animation move amount reduced so it stays on screen */
+  .photo {
+    transform: translate(-50%, -50%) !important;
+  }
+
+  /* Hide the right-side text on mobile */
+  .about-text {
+    display: none;
+  }
+
+  /* Video thumbnails taller for mobile */
+  .video-thumb video {
+    height: 210px;
+  }
+}
+
     </style>
   </head>
 
@@ -601,4 +652,5 @@
     </script>
   </body>
 </html>
+
 
